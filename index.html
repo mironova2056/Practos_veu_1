@@ -16,7 +16,7 @@
             <img :src="image" :alt="altText" />
         </div>
         <div class="product-info">
-            <h1>{{ product }}</h1>
+            <h1>{{ title }}</h1>
             <p>{{ description }}</p>
             <div class="product-stock">
                 <p v-if="inStock" >In Stock</p>
@@ -32,10 +32,11 @@
             <div v-for="variant in variants" :key="variant.variantId">
                 <p>{{ variant.variantColor }}</p>
             </div>
-            <div class="color-box" v-for="variant in variants"
+            <div class="color-box"
+                 v-for="(variant, index) in variants"
                  :key="variant.variantId"
                  :style="{backgroundColor: variant.variantColor}"
-                 @mouseover="updateProduct (variant.variantImage)"
+                 @mouseover="updateProduct (index)"
             >
             </div>
             <a :href="link">More products like this</a>
