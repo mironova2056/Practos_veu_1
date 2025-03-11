@@ -1,7 +1,45 @@
 
 Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
     template: `<div class="product">
-    // Здесь будет весь HTML-код, который раньше был в элементе с классом product
+        <div class="product-image">
+            <img :src="image" :alt="altText" />
+        </div>
+        <div class="product-info">
+            <h1>{{ title }}</h1>
+            <p>{{ description }}</p>
+            <div class="product-stock">
+                <p v-if="inStock" >In Stock</p>
+                <p v-else :class="{empty: !inStock}">Out of Stock</p>
+                <span v-show="onSale">On Sale</span>
+            </div>
+            <product-details :details="details"></product-details>
+            <ol>
+                <li v-for="size in sizes">{{ size }}</li>
+            </ol>
+            <p>Shipping: {{shipping}}</p>
+            <div v-for="variant in variants" :key="variant.variantId">
+                <p>{{ variant.variantColor }}</p>
+            </div>
+            <div class="color-box"
+                 v-for="(variant, index) in variants"
+                 :key="variant.variantId"
+                 :style="{backgroundColor: variant.variantColor}"
+                 @mouseover="updateProduct (index)"
+            >
+            </div>
+            <a :href="link">More products like this</a>
+            <div class="cart">
+                <p>Cart {{ cart }}</p>
+                <button class="add" v-on:click="addToCart" :disabled="!inStock" :class="{disabledButton: !inStock}">Add to cart </button>
+                <button class="delete" v-on:click="deleteFromCart">Delete </button>
+            </div>
+        </div>
    </div>`,
     data() {
         return {
@@ -61,11 +99,33 @@ Vue.component('product', {
             } else {
                 return this.brand + ' ' + this.product + 'NOT On Sale';
             }
+        },
+        shipping(){
+            if(this.premium){
+                return "Free";
+            }else {
+                return 2.99
+            }
         }
     }
 })
-
+Vue.component('product-details', {
+    props: {
+      details: {
+          type: Array,
+          required: false
+      }
+    },
+    template: `
+        <ul>
+            <li v-for="detail in details">{{ detail }}</li>
+        </ul>
+    `,
+})
 
 let app = new Vue({
     el: '#app',
+    data: {
+        premium: true
+    }
 });
