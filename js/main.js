@@ -36,6 +36,18 @@ Vue.component('product', {
             <button class="add" v-on:click="addToCart" :disabled="!inStock" :class="{disabledButton: !inStock}">Add to cart </button>
             <button class="delete" v-on:click="deleteFromCart">Delete </button>
             <a :href="link">More products like this</a>
+            <div>
+                <h2>Reviews</h2>
+                <p v-if="!reviews.length">There are no reviews yet.</p>
+                <ul>
+                    <li v-for="review in reviews">
+                        <p>{{ review.name }}</p>
+                        <p>Rating: {{review.rating}}</p>
+                        <p>{{review.review}}</p>
+                    </li>
+                </ul>
+            </div>
+            <product-review @review-submittes="addReview"></product-review>
 
         </div>
    </div>`,
@@ -64,6 +76,7 @@ Vue.component('product', {
             ],
             sizes: ['S', 'M', 'L', 'XL'],
             selectedVariant: 0,
+            reviews: [],
         }
     },
     methods: {
@@ -76,6 +89,9 @@ Vue.component('product', {
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
+        },
+        addReview(productReview) {
+            this.reviews.push(productReview);
         },
     },
     computed: {
@@ -117,6 +133,82 @@ Vue.component('product-details', {
         </ul>
     `,
 })
+Vue.component('product-review', {
+    template: `
+    <form class="review-form" @submit.prevent="onSubmit">
+        <p>
+            <label for="name">Name</label>
+            <input id="name" v-model="name" placeholder="name" >
+        </p>
+        <p>
+            <label for="review">Review</label>
+            <textarea id="review" v-model="review" ></textarea>
+        </p>
+        <p>
+            <label for="rating">Rating</label>
+            <select id="rating" v-model.number="rating">
+                <option>5</option>
+                <option>4</option>
+                <option>3</option>
+                <option>2</option>
+                <option>1</option>
+            </select>
+        </p>
+        <p>
+            <label for="question">Would you recommend this product?</label>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="question" id="question" v-model="question">Yes
+                </label>
+                <br>
+                 <label>
+                    <input type="radio" name="question" id="question" v-model="question">No
+                </label>
+            </div>
+        </p>
+        <p>
+            <input type="submit" value="Submit"></input>
+        </p>
+        <p v-if="errors.length">
+            <b>Please correct the following error(s)</b>
+            <ul>
+                <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+            </ul>
+        </p>
+    </form>`,
+    data() {
+        return{
+            name: null,
+            review: null,
+            rating: null,
+            question: null,
+            errors: [],
+        }
+    },
+    methods: {
+        onSubmit() {
+            this.errors = [];
+            if (this.name && this.review && this.rating) {
+                let productReview = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
+                    question: this.question,
+                }
+                this.$emit('review-submitted', productReview);
+                this.name = null
+                this.review = null
+                this.rating = null
+                this.question = null
+            }else {
+                if(!this.name) this.errors.push("Please enter a name");
+                if(!this.review) this.errors.push("Please enter a review");
+                if(!this.rating) this.errors.push("Please enter a rating");
+                if(!this.question) this.errors.push("Please enter yes or no");
+            }
+        }
+    }
+})
 
 let app = new Vue({
     el: '#app',
@@ -130,6 +222,7 @@ let app = new Vue({
         },
         deleteFromCart(id){
             this.cart = this.cart.filter(itemId=> itemId !== id);
+            console.log(`Товар с ID ${id} был удален из корзины.`);
         }
     }
 });

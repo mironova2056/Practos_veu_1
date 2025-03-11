@@ -95,3 +95,7 @@ textarea {
 .empty{
     text-decoration: line-through;
 }
+.radio{
+    display: inline-block;
+
+}
