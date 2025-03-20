@@ -64,7 +64,7 @@ Vue.component('product-review', {
                     rating: this.rating,
                     question: this.question,
                 };
-                eventBus.$emit('review-submitted', productReview);
+                this.$emit('review-submitted', productReview);
                 this.name = '';
                 this.review = '';
                 this.rating = null;
@@ -132,7 +132,7 @@ Vue.component('product-tabs', {
     data() {
         return {
             tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
-            selectedTab: 'Reviews'
+            selectedTab: 'Reviews',
         }
     },
     methods: {
