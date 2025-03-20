@@ -90,7 +90,7 @@ Vue.component('product-tabs', {
             required: true
         },
         shippingCost: {
-            type: String,
+            type: Number,
             required: true
         }
     },
@@ -207,12 +207,14 @@ Vue.component('product', {
                     variantColor: "green",
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
                     variantQuantity: 10,
+                    shippingPrice: 10,
                 },
                 {
                     variantId: 2235,
                     variantColor: "blue",
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
                     variantQuantity: 0,
+                    shippingPrice: 15,
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL'],
@@ -222,10 +224,20 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+            const variant = this.variants[this.selectedVariant];
+            this.$emit('add-to-cart',{
+                id: variant.variantId,
+                color: variant.variantColor,
+                shippingPrice: variant.shippingPrice,
+            });
         },
         deleteFromCart() {
-            this.$emit('delete-from-cart', this.variants[this.selectedVariant].variantId);
+            const variant = this.variants[this.selectedVariant];
+            this.$emit('delete-from-cart', {
+                id: variant.variantId,
+                color: variant.variantColor,
+                shippingPrice: variant.shippingPrice,
+            });
         },
         updateProduct(index) {
             this.selectedVariant = index;
@@ -252,7 +264,7 @@ Vue.component('product', {
             }
         },
         shipping() {
-            return this.premium ? "Free" : "2.99";
+            return this.variants[this.selectedVariant].shippingPrice;
         }
     }
 });
@@ -262,6 +274,7 @@ let app = new Vue({
     data: {
         premium: true,
         cart: [],
+        shippingCost: 0,
     },
     methods: {
         updateCart(id) {
@@ -270,6 +283,21 @@ let app = new Vue({
         deleteFromCart(id) {
             this.cart = this.cart.filter(itemId => itemId !== id);
             console.log(`Product with ID ${id} removed from cart.`);
+        },
+        calculateShipping() {
+            const colorsInCart = this.cart.map(item => item.color);
+            const hasGreen = colorsInCart.includes('green');
+            const hasBlue = colorsInCart.includes('blue');
+
+            if (hasGreen && hasBlue) {
+                this.shippingCost = 25;
+            }else if (hasGreen){
+                this.shippingCost = 10;
+            } else if (hasBlue){
+                this.shippingCost = 15;
+            }else {
+                this.shippingCost = 0;
+            }
         }
     }
 });

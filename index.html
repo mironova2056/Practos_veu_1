@@ -12,7 +12,13 @@
 <body>
 <div id="app">
     <div class="cart">
-        <p>Cart {{ cart.length }}</p>
+        <p v-if="cart.length === 0">Cart is empty</p>
+        <ul v-else>
+            <li v-for="item in cart" :key="item.id">
+                {{ item.color }} socks - Shipping: ${{ item.shippingPrice }}
+            </li>
+        </ul>
+        <p>Total Shipping Cost: ${{ shippingCost }}</p>
     </div>
     <product :premium="premium" @add-to-cart="updateCart" @delete-from-cart="deleteFromCart"></product>
 </div>
